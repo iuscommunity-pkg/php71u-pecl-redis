@@ -35,6 +35,9 @@ Requires:       php(zend-abi) = %{php_zend_api}
 Requires:       php(api) = %{php_core_api}
 Requires:       %{php_base}-igbinary%{?_isa}
 
+Requires(post): pecl >= 1.10.0
+Requires(postun): pecl >= 1.10.0
+
 # provide the stock name
 Provides:       php-pecl-%{pecl_name} = %{version}
 Provides:       php-pecl-%{pecl_name}%{?_isa} = %{version}
@@ -226,6 +229,16 @@ exit $ret
 %endif
 
 
+%post
+%{pecl_install} %{pecl_xmldir}/%{pecl_name}.xml >/dev/null || :
+
+
+%postun
+if [ $1 -eq 0 ]; then
+    %{pecl_uninstall} %{pecl_name} >/dev/null || :
+fi
+
+
 %files
 %license NTS/COPYING
 %doc %{pecl_docdir}/%{pecl_name}
@@ -245,6 +258,7 @@ exit $ret
 - Port from Fedora to IUS
 - Build with pear1u (via "pecl" virtual provides)
 - Install package.xml as %%{pecl_name}.xml, not %%{name}.xml
+- Re-add scriptlets (file triggers not yet available in EL)
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 3.0.0-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php71
