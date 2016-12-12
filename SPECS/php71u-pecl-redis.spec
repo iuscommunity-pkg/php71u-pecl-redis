@@ -194,17 +194,8 @@ sed -e "s:/^pidfile.*$:/pidfile $PWD/run/redis.pid:" \
     -e "s:/var:$PWD:" \
     -e "/daemonize/s/no/yes/" \
     /etc/redis.conf >redis.conf
-# port number to allow 32/64 build at same time
-# and avoid conflict with a possible running server
-%if 0%{?__isa_bits}
-port=$(expr %{__isa_bits} + 6350)
-%else
-%ifarch x86_64
-port=6414
-%else
-port=6382
-%endif
-%endif
+# use a random port to avoid conflicts
+port=%(shuf -i 6000-6999 -n 1)
 sed -e "s/6379/$port/" -i redis.conf
 sed -e "s/6379/$port/" -i *.php
 %{_bindir}/redis-server ./redis.conf
@@ -259,6 +250,7 @@ fi
 - Build with pear1u (via "pecl" virtual provides)
 - Install package.xml as %%{pecl_name}.xml, not %%{name}.xml
 - Re-add scriptlets (file triggers not yet available in EL)
+- Use a random port in %%check to avoid conflicts
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 3.0.0-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php71
