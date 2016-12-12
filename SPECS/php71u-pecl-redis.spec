@@ -23,6 +23,10 @@ Group:          Development/Languages
 URL:            http://pecl.php.net/package/%{pecl_name}
 Source0:        http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
+# testExpireAtWithLong fails on 32bit (i686) build
+# https://github.com/phpredis/phpredis/issues/838
+Patch1:        skip-testExpireAtWithLong-32bit.patch
+
 BuildRequires:  %{php_base}-devel
 BuildRequires:  pecl >= 1.10.0
 BuildRequires:  %{php_base}-pecl-igbinary-devel
@@ -73,6 +77,7 @@ some doesn't work with an old redis server version.
 
 %prep
 %setup -q -c
+%patch1 -p1
 
 # Don't install/register tests
 sed -e 's/role="test"/role="src"/' \
@@ -251,6 +256,7 @@ fi
 - Install package.xml as %%{pecl_name}.xml, not %%{name}.xml
 - Re-add scriptlets (file triggers not yet available in EL)
 - Use a random port in %%check to avoid conflicts
+- Add Patch1 to skip testExpireAtWithLong on 32bit build (gh#838)
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 3.0.0-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php71
