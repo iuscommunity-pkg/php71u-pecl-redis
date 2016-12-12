@@ -24,7 +24,7 @@ URL:            http://pecl.php.net/package/%{pecl_name}
 Source0:        http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
 BuildRequires:  %{php_base}-devel
-BuildRequires:  php-pear
+BuildRequires:  pecl >= 1.10.0
 BuildRequires:  %{php_base}-pecl-igbinary-devel
 # to run Test suite
 %if %{with_tests}
@@ -243,6 +243,7 @@ exit $ret
 %changelog
 * Sun Dec 11 2016 Carl George <carl.george@rackspace.com> - 3.0.0-1.ius
 - Port from Fedora to IUS
+- Build with pear1u (via "pecl" virtual provides)
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 3.0.0-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php71
