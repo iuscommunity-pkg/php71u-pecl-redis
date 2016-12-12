@@ -170,6 +170,9 @@ install -D -m 644 package.xml %{buildroot}%{pecl_xmldir}/%{pecl_name}.xml
 
 # Documentation
 pushd NTS
+for i in $(grep 'role="test"' ../package.xml | sed -e 's/^.*name="//;s/".*$//')
+do install -D -p -m 644 $i %{buildroot}%{pecl_testdir}/%{pecl_name}/$i
+done
 for i in $(grep 'role="doc"' ../package.xml | sed -e 's/^.*name="//;s/".*$//')
 do install -D -p -m 644 $i %{buildroot}%{pecl_docdir}/%{pecl_name}/$i
 done
@@ -257,6 +260,7 @@ fi
 - Re-add scriptlets (file triggers not yet available in EL)
 - Use a random port in %%check to avoid conflicts
 - Add Patch1 to skip testExpireAtWithLong on 32bit build (gh#838)
+- Install tests in %%{pecl_testdir}
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 3.0.0-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php71
