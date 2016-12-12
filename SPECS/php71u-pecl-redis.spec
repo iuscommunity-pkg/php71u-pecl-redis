@@ -158,7 +158,7 @@ install -D -m 644 %{ini_name} %{buildroot}%{php_ztsinidir}/%{ini_name}
 %endif
 
 # Install the package XML file
-install -D -m 644 package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
+install -D -m 644 package.xml %{buildroot}%{pecl_xmldir}/%{pecl_name}.xml
 
 # Documentation
 pushd NTS
@@ -229,7 +229,7 @@ exit $ret
 %files
 %license NTS/COPYING
 %doc %{pecl_docdir}/%{pecl_name}
-%{pecl_xmldir}/%{name}.xml
+%{pecl_xmldir}/%{pecl_name}.xml
 
 %{php_extdir}/%{pecl_name}.so
 %config(noreplace) %{php_inidir}/%{ini_name}
@@ -244,6 +244,7 @@ exit $ret
 * Sun Dec 11 2016 Carl George <carl.george@rackspace.com> - 3.0.0-1.ius
 - Port from Fedora to IUS
 - Build with pear1u (via "pecl" virtual provides)
+- Install package.xml as %%{pecl_name}.xml, not %%{name}.xml
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 3.0.0-2
 - rebuild for https://fedoraproject.org/wiki/Changes/php71
