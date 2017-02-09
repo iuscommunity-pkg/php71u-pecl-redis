@@ -10,7 +10,7 @@
 #
 %global pecl_name   redis
 %global with_zts    0%{?__ztsphp:1}
-%global with_tests  0%{?_with_tests:1}
+%global with_tests  1%{?_with_tests:1}
 %global ini_name    50-%{pecl_name}.ini
 %global php_base    php71u
 
