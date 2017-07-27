@@ -9,15 +9,16 @@
 # Please, preserve the changelog entries
 #
 %global pecl_name   redis
-%global with_zts    0%{?__ztsphp:1}
-%global with_tests  1%{?_with_tests:1}
 %global ini_name    50-%{pecl_name}.ini
 %global php_base    php71u
+
+%bcond_without zts
+%bcond_without tests
 
 Summary:        Extension for communicating with the Redis key-value store
 Name:           %{php_base}-pecl-%{pecl_name}
 Version:        3.1.3
-Release:        1.ius%{?dist}
+Release:        2.ius%{?dist}
 License:        PHP
 Group:          Development/Languages
 URL:            http://pecl.php.net/package/%{pecl_name}
@@ -26,10 +27,7 @@ Source0:        http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 BuildRequires:  %{php_base}-devel
 BuildRequires:  pecl >= 1.10.0
 BuildRequires:  %{php_base}-pecl-igbinary-devel
-# to run Test suite
-%if %{with_tests}
-BuildRequires:  redis >= 2.6
-%endif
+%{?with_tests:BuildRequires: redis >= 2.6}
 
 Requires:       php(zend-abi) = %{php_zend_api}
 Requires:       php(api) = %{php_core_api}
@@ -92,10 +90,7 @@ if test "x${extver}" != "x%{version}"; then
 fi
 popd
 
-%if %{with_zts}
-# duplicate for ZTS build
-cp -pr NTS ZTS
-%endif
+%{?with_zts:cp -pr NTS ZTS}
 
 # Drop in the bit of configuration
 cat > %{ini_name} << 'EOF'
@@ -136,7 +131,7 @@ pushd NTS
 make %{?_smp_mflags}
 popd
 
-%if %{with_zts}
+%if %{with zts}
 pushd ZTS
 %{_bindir}/zts-phpize
 %configure \
@@ -154,7 +149,7 @@ popd
 make -C NTS install INSTALL_ROOT=%{buildroot}
 install -D -m 644 %{ini_name} %{buildroot}%{php_inidir}/%{ini_name}
 
-%if %{with_zts}
+%if %{with zts}
 # Install the ZTS stuff
 make -C ZTS install INSTALL_ROOT=%{buildroot}
 install -D -m 644 %{ini_name} %{buildroot}%{php_ztsinidir}/%{ini_name}
@@ -181,14 +176,14 @@ popd
     --define extension=%{buildroot}%{php_extdir}/%{pecl_name}.so \
     --modules | grep %{pecl_name}
 
-%if %{with_zts}
+%if %{with zts}
 %{__ztsphp} --no-php-ini \
     --define extension=igbinary.so \
     --define extension=%{buildroot}%{php_ztsextdir}/%{pecl_name}.so \
     --modules | grep %{pecl_name}
 %endif
 
-%if %{with_tests}
+%if %{with tests}
 pushd NTS/tests
 
 # Launch redis server
@@ -243,13 +238,16 @@ fi
 %{php_extdir}/%{pecl_name}.so
 %config(noreplace) %{php_inidir}/%{ini_name}
 
-%if %{with_zts}
+%if %{with zts}
 %{php_ztsextdir}/%{pecl_name}.so
 %config(noreplace) %{php_ztsinidir}/%{ini_name}
 %endif
 
 
 %changelog
+* Thu Jul 27 2017 Carl George <carl@george.computer> - 3.1.3-2.ius
+- Convert with_zts and with_tests macros to conditionals
+
 * Mon Jul 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.1.3-1.ius
 - Latest upstream
 
