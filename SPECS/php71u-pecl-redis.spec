@@ -21,8 +21,8 @@ Name:           %{php}-pecl-%{pecl_name}
 Version:        3.1.6
 Release:        1.ius%{?dist}
 License:        PHP
-URL:            http://pecl.php.net/package/%{pecl_name}
-Source0:        http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
+URL:            https://pecl.php.net/package/%{pecl_name}
+Source0:        https://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
 BuildRequires:  %{php}-devel
 BuildRequires:  pecl >= 1.10.0
@@ -87,7 +87,9 @@ if test "x${extver}" != "x%{version}"; then
    exit 1
 fi
 
-%{?with_zts:cp -pr NTS ZTS}
+%if %{with zts}
+cp -pr NTS ZTS
+%endif
 
 cat > %{ini_name} << EOF
 ; Enable %{pecl_name} extension module
@@ -124,7 +126,7 @@ pushd NTS
     --enable-redis-session \
 %{?with_igbinary: --enable-redis-igbinary} \
     --with-php-config=%{_bindir}/php-config
-make %{?_smp_mflags}
+%make_build
 popd
 
 %if %{with zts}
@@ -135,7 +137,7 @@ pushd ZTS
     --enable-redis-session \
 %{?with_igbinary: --enable-redis-igbinary} \
     --with-php-config=%{_bindir}/zts-php-config
-make %{?_smp_mflags}
+%make_build
 popd
 %endif
 
@@ -151,11 +153,9 @@ install -D -p -m 644 %{ini_name} %{buildroot}%{php_ztsinidir}/%{ini_name}
 
 install -D -p -m 644 package.xml %{buildroot}%{pecl_xmldir}/%{pecl_name}.xml
 
-pushd NTS
-for i in $(grep 'role="doc"' ../package.xml | sed -e 's/^.*name="//;s/".*$//')
-do install -D -p -m 644 $i %{buildroot}%{pecl_docdir}/%{pecl_name}/$i
+for i in $(grep 'role="doc"' package.xml | sed -e 's/^.*name="//;s/".*$//')
+do install -D -p -m 644 NTS/$i %{buildroot}%{pecl_docdir}/%{pecl_name}/$i
 done
-popd
 
 
 %check
